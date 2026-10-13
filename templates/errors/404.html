@@ -1,0 +1,7 @@
+{% extends "errors/base.html" %}
+{% block title %}Not found{% endblock %}
+{% block body %}
+<h1>Page not found</h1>
+<p>That address is not part of the motorela registry.</p>
+<a class="btn btn-green" href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('main.landing') }}">Return</a>
+{% endblock %}

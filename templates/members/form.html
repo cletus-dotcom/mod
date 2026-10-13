@@ -1,0 +1,44 @@
+{% extends "app_base.html" %}
+{% block title %}{% if member %}Edit {{ member.body_number }}{% else %}New record{% endif %}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{% if member %}{{ member.body_number }}{% else %}New unit{% endif %}</p>
+    <h1>{% if member %}Edit record{% else %}Add a record{% endif %}</h1>
+  </div>
+</header>
+<form class="panel form-grid" method="post" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+  {% macro field(f, hint='', wide=false) %}
+    <div class="field {% if wide %}span-2{% endif %} {% if f.flags.required %}required{% endif %} {% if f.errors %}is-invalid{% endif %}">
+      {{ f.label(class="label") }}
+      {{ f(class="input") }}
+      {% if hint %}<p class="hint">{{ hint }}</p>{% endif %}
+      {% for error in f.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+  {% endmacro %}
+  {{ field(form.body_number) }}
+  {{ field(form.status) }}
+  {{ field(form.owner_name, 'The operator recorded as owner of the unit.', true) }}
+  {{ field(form.driver_name, 'Enter OWNER when the owner drives this unit.', true) }}
+  {{ field(form.address) }}
+  {{ field(form.association) }}
+  <datalist id="associations">
+    {% for name in associations %}<option value="{{ name }}"></option>{% endfor %}
+  </datalist>
+  {{ field(form.franchise_number) }}
+  {{ field(form.contact_number) }}
+  {{ field(form.notes, '', true) }}
+  {{ field(form.photo, 'Optional JPG, PNG, or WebP, up to 3 MB.', true) }}
+  {% if member and member.photo_filename %}
+    <div class="span-2 current-photo">
+      <img src="{{ url_for('static', filename='uploads/' ~ member.photo_filename) }}" alt="Current photograph of {{ member.owner_name }}">
+      <label class="check" for="remove_photo">{{ form.remove_photo(id="remove_photo") }} <span>Remove the current photograph</span></label>
+    </div>
+  {% endif %}
+  <div class="span-2 detail-actions">
+    <button class="btn btn-green" type="submit">{% if member %}Save changes{% else %}Save record{% endif %}</button>
+    <a class="btn btn-ghost" href="{{ url_for('members.detail', member_id=member.id) if member else url_for('members.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

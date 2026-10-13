@@ -1,0 +1,172 @@
+{% extends "app_base.html" %}
+{% block title %}Print IDs{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Motorela identification</p>
+    <h1>Print</h1>
+  </div>
+</header>
+<p class="hint print-note">
+  Each ID is half of a letter sheet in landscape: 5.5 by 8.5 inches. A single print uses the left half. Bulk print places two IDs on each page. In the print dialog, choose letter paper, landscape, and actual size.
+  ID NO. is the franchise number, CAB NO. is the body number, and VALID FROM. is 1 January of the record year.
+</p>
+<div class="mode-switch" role="tablist" aria-label="Print mode">
+  <a class="btn {% if mode == 'single' %}btn-gold{% else %}btn-green{% endif %}" href="{{ qurl(mode='single', page=1) }}" {% if mode == 'single' %}aria-current="page"{% endif %}>Single</a>
+  <a class="btn {% if mode == 'bulk' %}btn-gold{% else %}btn-green{% endif %}" href="{{ qurl(mode='bulk', page=1) }}" {% if mode == 'bulk' %}aria-current="page"{% endif %}>Bulk</a>
+</div>
+<form id="print-filters" class="panel filters" method="get" action="{{ url_for('cards.index') }}">
+  <input type="hidden" name="mode" value="{{ mode }}">
+  <div class="field">
+    <label class="label" for="q">Find a record</label>
+    <input class="input" id="q" name="q" value="{{ q }}" placeholder="Body number, name, franchise, or address" autocomplete="off">
+  </div>
+  <div class="filter-grid">
+    <div class="field">
+      <label class="label" for="association">Association</label>
+      <select class="input" id="association" name="association">
+        <option value="">All associations</option>
+        <option value="__blank__" {% if association == '__blank__' %}selected{% endif %}>No association</option>
+        {% for name in associations %}
+          <option value="{{ name }}" {% if association == name %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label class="label" for="kind">Driver</label>
+      <select class="input" id="kind" name="kind">
+        <option value="">All drivers</option>
+        <option value="owner" {% if kind == 'owner' %}selected{% endif %}>Owner-drivers</option>
+        <option value="hired" {% if kind == 'hired' %}selected{% endif %}>Assigned drivers</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label" for="status">Status</label>
+      <select class="input" id="status" name="status">
+        <option value="">Any status</option>
+        {% for item in ['Active', 'Suspended', 'Expired'] %}
+          <option value="{{ item }}" {% if status == item %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="page-head" style="margin:.8rem 0 0;">
+    <button class="btn btn-green" type="submit">Search</button>
+    {% if has_filter %}
+      <a href="{{ qurl(q=None, association=None, kind=None, status=None, page=None) }}">Clear filters</a>
+    {% endif %}
+  </div>
+</form>
+<p class="result-count">
+  {% if pagination.total %}
+    {{ pagination.total }} matching {{ 'record' if pagination.total == 1 else 'records' }}
+  {% else %}
+    No matching records
+  {% endif %}
+</p>
+{% if pagination.items %}
+<form method="post" action="{{ url_for('cards.index') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="mode" value="{{ mode }}">
+  <input type="hidden" name="q" value="{{ q }}">
+  <input type="hidden" name="association" value="{{ association }}">
+  <input type="hidden" name="kind" value="{{ kind }}">
+  <input type="hidden" name="status" value="{{ status }}">
+  {% if mode == 'bulk' %}
+    <label class="check pick-all"><input id="pick-all" type="checkbox"> Select every record on this page</label>
+  {% endif %}
+  <div class="table-wrap panel" style="padding:.3rem .4rem;">
+    <table class="registry-table print-table">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Choose</span></th>
+          <th scope="col">Body no.</th>
+          <th scope="col">Driver</th>
+          <th scope="col">Franchise</th>
+          <th scope="col">Address</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in pagination.items %}
+          <tr>
+            <td class="pick-cell" data-label="Choose">
+              {% if mode == 'single' %}
+                <label class="check">
+                  <input type="radio" name="member_id" value="{{ member.id }}" required aria-label="Print {{ member.body_number }}">
+                </label>
+              {% else %}
+                <label class="check">
+                  <input class="pick" type="checkbox" name="member_id" value="{{ member.id }}" aria-label="Include {{ member.body_number }}">
+                </label>
+              {% endif %}
+            </td>
+            <td class="primary" data-label="Body no."><a href="{{ url_for('members.detail', member_id=member.id) }}">{{ member.body_number }}</a></td>
+            <td data-label="Driver">{{ member.driver_display }}</td>
+            <td data-label="Franchise">{{ member.franchise_number }}</td>
+            <td data-label="Address">{{ member.address }}</td>
+            <td data-label="Status"><span class="status status-{{ member.status|lower }}">{{ member.status }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if pagination.pages > 1 %}
+  <nav class="pager" aria-label="Pages">
+    <div class="pages">
+      {% if pagination.has_prev %}
+        <a class="page" href="{{ qurl(page=pagination.prev_num) }}">Prev</a>
+      {% endif %}
+      {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=1) %}
+        {% if p %}
+          {% if p == pagination.page %}
+            <span class="page is-current" aria-current="page">{{ p }}</span>
+          {% else %}
+            <a class="page" href="{{ qurl(page=p) }}">{{ p }}</a>
+          {% endif %}
+        {% else %}
+          <span>…</span>
+        {% endif %}
+      {% endfor %}
+      {% if pagination.has_next %}
+        <a class="page" href="{{ qurl(page=pagination.next_num) }}">Next</a>
+      {% endif %}
+    </div>
+  </nav>
+  {% endif %}
+  <div class="print-actions">
+    {% if mode == 'single' %}
+      <button class="btn btn-gold" type="submit" name="scope" value="selected">Print this ID</button>
+    {% else %}
+      <button class="btn btn-gold" type="submit" name="scope" value="selected">Print selected</button>
+      <button class="btn btn-green" type="submit" name="scope" value="matching" id="print-matching" data-count="{{ pagination.total }}">Print all {{ pagination.total }} matching</button>
+      <p class="hint">Selected records are the ones checked on this page. Print all matching includes every record in this search.</p>
+    {% endif %}
+  </div>
+</form>
+{% else %}
+<div class="panel empty">
+  <h2>Nothing matches</h2>
+  <p class="muted" style="margin-top:.4rem;">Try another name, body number, or franchise.</p>
+</div>
+{% endif %}
+<script>
+  const pickAll = document.getElementById("pick-all");
+  if (pickAll) {
+    pickAll.addEventListener("change", () => {
+      document.querySelectorAll(".pick").forEach((box) => {
+        box.checked = pickAll.checked;
+      });
+    });
+  }
+  const printMatching = document.getElementById("print-matching");
+  if (printMatching) {
+    printMatching.addEventListener("click", (event) => {
+      const count = printMatching.dataset.count;
+      if (!window.confirm("Print " + count + " IDs on letter paper, landscape?")) {
+        event.preventDefault();
+      }
+    });
+  }
+</script>
+{% endblock %}

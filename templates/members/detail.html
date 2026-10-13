@@ -1,0 +1,41 @@
+{% extends "app_base.html" %}
+{% block title %}{{ member.body_number }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ member.association or 'No association' }} · {{ member.record_year }}</p>
+    <h1>{{ member.body_number }}</h1>
+  </div>
+  <div class="detail-actions">
+    <a class="btn btn-gold" href="{{ url_for('members.card', member_id=member.id) }}" target="_blank" rel="noopener">Print ID</a>
+    <a class="btn btn-green" href="{{ url_for('members.edit', member_id=member.id) }}">Edit</a>
+    <form method="post" action="{{ url_for('members.delete', member_id=member.id) }}" data-confirm="Delete {{ member.body_number }}, {{ member.owner_name }}? This removes the row from the registry.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+</header>
+<section class="panel">
+  {% if member.photo_filename %}
+    <img class="portrait" src="{{ url_for('static', filename='uploads/' ~ member.photo_filename) }}" alt="Photograph of {{ member.owner_name }}">
+  {% endif %}
+  <dl class="facts">
+    <div><dt>Owner</dt><dd>{{ member.owner_name }}</dd></div>
+    <div><dt>Driver</dt><dd>{{ member.driver_display }} <span class="badge">{{ member.driver_role }}</span></dd></div>
+    <div><dt>Franchise number</dt><dd>{{ member.franchise_number }}</dd></div>
+    <div><dt>Association</dt><dd>{{ member.association or '—' }}</dd></div>
+    <div><dt>Address</dt><dd>{{ member.address }}</dd></div>
+    <div><dt>Barangay</dt><dd>{{ member.barangay }}</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-{{ member.status|lower }}">{{ member.status }}</span></dd></div>
+    <div><dt>Contact</dt><dd>{{ member.contact_number or '—' }}</dd></div>
+  </dl>
+  {% if member.notes %}
+    <h2 style="font-size:1.8rem;margin:1rem 0 .4rem;">Notes</h2>
+    <p class="note">{{ member.notes }}</p>
+  {% endif %}
+  <p class="hint" style="margin-top:1rem;">
+    Updated {{ member.updated_at|manila }}{% if member.updated_by %} by {{ member.updated_by.full_name }}{% endif %}.
+    Added {{ member.created_at|manila('%d %b %Y') }}.
+  </p>
+</section>
+{% endblock %}

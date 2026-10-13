@@ -1,0 +1,84 @@
+<p class="result-count">
+  {% if pagination.total %}
+    Showing {{ window_start }}–{{ window_end }} of {{ pagination.total }}
+  {% else %}
+    No matching records
+  {% endif %}
+</p>
+{% if pagination.items %}
+<div class="table-wrap panel" style="padding: .3rem .4rem;">
+  <table class="registry-table">
+    <thead>
+      <tr>
+        {% for key, label in [('body', 'Body no.'), ('owner', 'Owner'), ('driver', 'Driver'), ('association', 'Association'), ('franchise', 'Franchise'), ('address', 'Address'), ('status', 'Status')] %}
+          <th scope="col" aria-sort="{{ 'ascending' if sort == key and direction == 'asc' else 'descending' if sort == key else 'none' }}">
+            <a class="sort js-nav" href="{{ qurl(sort=key, dir='desc' if sort == key and direction == 'asc' else 'asc', page=1) }}">{{ label }}{% if sort == key %} <span aria-hidden="true">{{ '↑' if direction == 'asc' else '↓' }}</span>{% endif %}</a>
+          </th>
+        {% endfor %}
+        <th scope="col"><span class="sr-only">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member in pagination.items %}
+        <tr>
+          <td class="primary" data-label="Body no."><a href="{{ url_for('members.detail', member_id=member.id) }}">{{ member.body_number }}</a></td>
+          <td data-label="Owner">{{ member.owner_name }}</td>
+          <td data-label="Driver">
+            <div class="person">
+              <span>{{ member.driver_name }}</span>
+              <span class="badge">{{ member.driver_role }}</span>
+            </div>
+          </td>
+          <td data-label="Association">{{ member.association or '—' }}</td>
+          <td data-label="Franchise">{{ member.franchise_number }}</td>
+          <td data-label="Address">{{ member.address }}</td>
+          <td data-label="Status"><span class="status status-{{ member.status|lower }}">{{ member.status }}</span></td>
+          <td class="actions" data-label="Actions">
+            <a class="btn btn-text" href="{{ url_for('members.detail', member_id=member.id) }}">View</a>
+            <a class="btn btn-text" href="{{ url_for('members.edit', member_id=member.id) }}">Edit</a>
+            <a class="btn btn-text" href="{{ url_for('members.card', member_id=member.id) }}" target="_blank" rel="noopener">ID</a>
+            <form method="post" action="{{ url_for('members.delete', member_id=member.id) }}" data-confirm="Delete {{ member.body_number }}, {{ member.owner_name }}? This removes the row from the registry.">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-text danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pagination.pages > 1 %}
+<nav class="pager" aria-label="Pages">
+  <div class="pages">
+    {% if pagination.has_prev %}
+      <a class="page js-nav" href="{{ qurl(page=pagination.prev_num) }}">Prev</a>
+    {% endif %}
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=1) %}
+      {% if p %}
+        {% if p == pagination.page %}
+          <span class="page is-current" aria-current="page">{{ p }}</span>
+        {% else %}
+          <a class="page js-nav" href="{{ qurl(page=p) }}">{{ p }}</a>
+        {% endif %}
+      {% else %}
+        <span>…</span>
+      {% endif %}
+    {% endfor %}
+    {% if pagination.has_next %}
+      <a class="page js-nav" href="{{ qurl(page=pagination.next_num) }}">Next</a>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}
+{% else %}
+<div class="panel empty">
+  <h2>Nothing matches</h2>
+  <p class="muted" style="margin-top:.4rem;">
+    {% if has_filter %}
+      Try another name, body number, or franchise.
+    {% else %}
+      The registry has no rows yet.
+    {% endif %}
+  </p>
+</div>
+{% endif %}

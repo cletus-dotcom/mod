@@ -1,0 +1,76 @@
+{% extends "public_base.html" %}
+{% block title %}Motorela Operator and Driver Registry{% endblock %}
+{% block content %}
+<section class="hero" id="top">
+  <img class="hero-photo" src="{{ url_for('static', filename='img/hero.jpg') }}" alt="">
+  <div class="hero-shade"></div>
+  <div class="hero-copy">
+    <img class="hero-seal" src="{{ url_for('static', filename='img/seal.png') }}" alt="Official Seal of the Municipality of Jagna">
+    <div>
+      <p class="eyebrow">Municipality of Jagna · Record year {{ record_year }}</p>
+      <h1>Motorela Operators and Drivers registry</h1>
+      <p class="lede">The municipal roll of franchised motorela units in Jagna: owner, driver, body number, association, and franchise, kept in one desk for search, update, and identification.</p>
+      <div class="hero-actions">
+        {% if current_user.is_authenticated %}
+          <a class="btn btn-gold" href="{{ url_for('main.dashboard') }}">Open the desk</a>
+        {% else %}
+          <a class="btn btn-gold" href="{{ url_for('auth.login') }}">Sign in</a>
+        {% endif %}
+        <a class="btn btn-ghost" href="#about">About the register</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="figure-band" id="figures">
+  <div class="wrap">
+    <div class="stat-grid">
+      <article class="stat"><p>Registered units</p><b>{{ figures.total }}</b></article>
+      <article class="stat"><p>Owner-drivers</p><b>{{ figures.owner_drivers }}</b></article>
+      <article class="stat"><p>Associations</p><b>{{ figures.association_count }}</b></article>
+      <article class="stat"><p>Barangays</p><b>{{ figures.barangay_count }}</b></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="wrap">
+    <p class="eyebrow">The register</p>
+    <h2>One roll for every franchised unit.</h2>
+    <div class="card-grid">
+      <article class="step step-gold">
+        <span>1</span>
+        <h3>Search</h3>
+        <p>Find a unit by body number, owner, driver, franchise, association, or address.</p>
+      </article>
+      <article class="step step-blue">
+        <span>2</span>
+        <h3>Keep current</h3>
+        <p>Administrators and staff add and revise records when a driver, franchise, or status changes.</p>
+      </article>
+      <article class="step step-amber">
+        <span>3</span>
+        <h3>Print the ID</h3>
+        <p>Issue a municipal identification card carrying the seal, body number, and franchise.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 0;">
+  <div class="wrap">
+    <p class="eyebrow">Associations on the roll</p>
+    <h2>How the {{ record_year }} units are listed.</h2>
+    <div class="bar-list">
+      {% for row in figures.by_association %}
+        <div class="bar-row">
+          <div class="bar-label"><span>{{ row.name }}</span><span>{{ row.count }}</span></div>
+          <div class="bar"><span style="width: {{ row.pct }}%"></span></div>
+        </div>
+      {% else %}
+        <p class="muted">The workbook has not been loaded yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

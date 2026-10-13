@@ -1,0 +1,27 @@
+{% extends "public_base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<section class="login-layout">
+  <div class="panel login-card">
+    <img class="seal" src="{{ url_for('static', filename='img/seal.png') }}" alt="Official Seal of the Municipality of Jagna">
+    <p class="eyebrow" style="text-align:center;">Municipality of Jagna</p>
+    <h1>Sign in</h1>
+    <p class="lede">Administrator and staff desks for the motorela registry.</p>
+    <form class="stack" method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+      {{ form.hidden_tag() }}
+      <div class="field required {% if form.username.errors %}is-invalid{% endif %}">
+        {{ form.username.label(class="label") }}
+        {{ form.username(class="input") }}
+        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field required {% if form.password.errors %}is-invalid{% endif %}">
+        {{ form.password.label(class="label") }}
+        {{ form.password(class="input") }}
+        {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <label class="check" for="remember">{{ form.remember(id="remember") }} <span>{{ form.remember.label.text }}</span></label>
+      <button class="btn btn-green" type="submit">Enter the registry</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d18">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}Desk{% endblock %} · Jagna Motorela</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/seal.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <div class="backdrop" id="backdrop" hidden></div>
+  <aside class="sidebar" id="sidebar">
+    <button class="btn btn-ghost sidebar-close" type="button">Close</button>
+    <a class="side-brand" href="{{ url_for('main.dashboard') }}">
+      <img src="{{ url_for('static', filename='img/seal.png') }}" alt="">
+      <span>
+        <strong>Jagna</strong>
+        <small>Record {{ record_year }}</small>
+      </span>
+    </a>
+    <nav class="side-nav">
+      {% if not current_user.must_change_password %}
+        <a class="side-link {% if request.endpoint == 'main.dashboard' %}is-active{% endif %}" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+        <a class="side-link {% if request.endpoint and request.endpoint.startswith('members.') %}is-active{% endif %}" href="{{ url_for('members.index') }}">Registry</a>
+        <a class="side-link {% if request.endpoint and request.endpoint.startswith('cards.') %}is-active{% endif %}" href="{{ url_for('cards.index') }}">Print</a>
+        {% if current_user.is_admin %}
+          <a class="side-link {% if request.endpoint and request.endpoint.startswith('users.') %}is-active{% endif %}" href="{{ url_for('users.index') }}">Users</a>
+        {% endif %}
+        <a class="side-link" href="{{ url_for('main.landing') }}">Public page</a>
+      {% endif %}
+      <a class="side-link {% if request.endpoint == 'auth.account' %}is-active{% endif %}" href="{{ url_for('auth.account') }}">Account</a>
+    </nav>
+    <form class="side-form" method="post" action="{{ url_for('auth.logout') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="side-link" type="submit">Sign out</button>
+    </form>
+    <div class="side-foot">
+      <p>Municipality of Jagna</p>
+      <p>Province of Bohol</p>
+    </div>
+  </aside>
+  <div class="shell">
+    <div class="main">
+      <header class="topbar">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar">
+          <span class="sr-only">Open menu</span>
+          <span class="burger" aria-hidden="true"></span>
+        </button>
+        <a class="topbar-brand" href="{{ url_for('main.dashboard') }}">
+          <img src="{{ url_for('static', filename='img/seal.png') }}" alt="">
+          Motorela Registry
+        </a>
+        <div class="who">
+          <span class="who-name">{{ current_user.full_name }}</span>
+          <span class="who-role">{{ current_user.role_label }}</span>
+        </div>
+      </header>
+      <main class="content" id="content">
+        {% include "partials/flashes.html" %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <dialog id="confirm-dialog">
+    <form method="dialog">
+      <h2>Confirm removal</h2>
+      <p></p>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" value="cancel">Cancel</button>
+        <button class="btn btn-danger" value="confirm">Delete record</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

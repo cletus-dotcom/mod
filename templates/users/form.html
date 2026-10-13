@@ -1,0 +1,51 @@
+{% extends "app_base.html" %}
+{% block title %}{% if editing %}Edit {{ editing.username }}{% else %}New user{% endif %}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Access</p>
+    <h1>{% if editing %}Edit {{ editing.username }}{% else %}Add a user{% endif %}</h1>
+  </div>
+</header>
+<form class="panel stack" method="post" style="max-width:40rem;">
+  {{ form.hidden_tag() }}
+  {% if editing %}
+    <p class="hint">Username <strong>{{ editing.username }}</strong> stays fixed.</p>
+  {% else %}
+    <div class="field required {% if form.username.errors %}is-invalid{% endif %}">
+      {{ form.username.label(class="label") }}
+      {{ form.username(class="input") }}
+      {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+  {% endif %}
+  <div class="field required {% if form.full_name.errors %}is-invalid{% endif %}">
+    {{ form.full_name.label(class="label") }}
+    {{ form.full_name(class="input") }}
+    {% for error in form.full_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </div>
+  <div class="field required {% if form.role.errors %}is-invalid{% endif %}">
+    {{ form.role.label(class="label") }}
+    {{ form.role(class="input") }}
+    {% for error in form.role.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </div>
+  {% if editing %}
+    <label class="check" for="is_active">{{ form.is_active(id="is_active") }} <span>Active account</span></label>
+    {% for error in form.is_active.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  {% endif %}
+  <div class="field {% if not editing %}required{% endif %} {% if form.password.errors %}is-invalid{% endif %}">
+    {{ form.password.label(class="label") }}
+    {{ form.password(class="input") }}
+    <p class="hint">{% if editing %}Leave blank to keep the current password. A reset asks them to choose a new one at the next sign-in.{% else %}At least 10 characters. They will replace it at first sign-in.{% endif %}</p>
+    {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </div>
+  <div class="field {% if form.confirm_password.errors %}is-invalid{% endif %}">
+    {{ form.confirm_password.label(class="label") }}
+    {{ form.confirm_password(class="input") }}
+    {% for error in form.confirm_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </div>
+  <div class="detail-actions">
+    <button class="btn btn-green" type="submit">{% if editing %}Save user{% else %}Create user{% endif %}</button>
+    <a class="btn btn-ghost" href="{{ url_for('users.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

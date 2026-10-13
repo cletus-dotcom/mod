@@ -1,0 +1,7 @@
+{% extends "errors/base.html" %}
+{% block title %}Not permitted{% endblock %}
+{% block body %}
+<h1>Not permitted</h1>
+<p>User accounts are kept by an administrator.</p>
+<a class="btn btn-green" href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('auth.login') }}">Return to the desk</a>
+{% endblock %}

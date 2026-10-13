@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+static/uploads/*
+!static/uploads/.gitkeep
+data/initial_accounts.txt
+data/*.xlsx

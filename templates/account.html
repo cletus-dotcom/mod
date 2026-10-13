@@ -1,0 +1,40 @@
+{% extends "app_base.html" %}
+{% block title %}Account{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ current_user.role_label }}</p>
+    <h1>Account</h1>
+  </div>
+</header>
+<section class="panel" style="max-width: 40rem;">
+  {% if current_user.must_change_password %}
+    <p class="callout">Replace the temporary password before the registry opens.</p>
+  {% endif %}
+  <form class="stack" method="post" style="margin-top:1rem;">
+    {{ form.hidden_tag() }}
+    <div class="field required {% if form.full_name.errors %}is-invalid{% endif %}">
+      {{ form.full_name.label(class="label") }}
+      {{ form.full_name(class="input") }}
+      {% for error in form.full_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="field required {% if form.current_password.errors %}is-invalid{% endif %}">
+      {{ form.current_password.label(class="label") }}
+      {{ form.current_password(class="input") }}
+      {% for error in form.current_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="field {% if form.new_password.errors %}is-invalid{% endif %}">
+      {{ form.new_password.label(class="label") }}
+      {{ form.new_password(class="input") }}
+      <p class="hint">At least 10 characters. Leave this blank to keep the current password.</p>
+      {% for error in form.new_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="field {% if form.confirm_password.errors %}is-invalid{% endif %}">
+      {{ form.confirm_password.label(class="label") }}
+      {{ form.confirm_password(class="input") }}
+      {% for error in form.confirm_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+    <button class="btn btn-green" type="submit">Save account</button>
+  </form>
+</section>
+{% endblock %}

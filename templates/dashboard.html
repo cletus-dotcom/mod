@@ -1,0 +1,74 @@
+{% extends "app_base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Record year {{ record_year }}</p>
+    <h1>Dashboard</h1>
+  </div>
+  <div class="actions">
+    <a class="btn btn-gold" href="{{ url_for('members.create') }}">Add record</a>
+    <a class="btn btn-green" href="{{ url_for('members.index') }}">Open registry</a>
+  </div>
+</header>
+<section class="stat-grid">
+  <article class="stat"><p>Registered units</p><b>{{ figures.total }}</b></article>
+  <article class="stat"><p>Owner-drivers</p><b>{{ figures.owner_drivers }}</b></article>
+  <article class="stat"><p>Assigned drivers</p><b>{{ figures.assigned_drivers }}</b></article>
+  <article class="stat"><p>Barangays</p><b>{{ figures.barangay_count }}</b></article>
+</section>
+<div class="dash-grid">
+  <section class="panel">
+    <p class="eyebrow">Associations</p>
+    <h2 style="font-size:2rem;margin-top:.3rem;">Units by association</h2>
+    <div class="bar-list">
+      {% for row in figures.by_association %}
+        <div>
+          <div class="bar-label"><span>{{ row.name }}</span><span>{{ row.count }} · {{ row.pct }}%</span></div>
+          <div class="bar"><span style="width: {{ row.pct }}%"></span></div>
+        </div>
+      {% endfor %}
+    </div>
+    {% if figures.unspecified %}
+      <p class="callout">{{ figures.unspecified }} unit{{ 's' if figures.unspecified != 1 else '' }} have no association on the roll.</p>
+    {% endif %}
+  </section>
+  <div class="stack">
+    <section class="panel">
+      <p class="eyebrow">Drivers</p>
+      <h2 style="font-size:2rem;margin-top:.3rem;">Who is at the wheel</h2>
+      <div class="split" style="--owner: {{ figures.owner_pct }}%"><span class="split-owner"></span><span class="split-hired"></span></div>
+      <div class="split-legend"><span>Owner-drivers {{ figures.owner_pct }}%</span><span>Assigned {{ 100 - figures.owner_pct }}%</span></div>
+    </section>
+    <section class="panel">
+      <p class="eyebrow">Addresses</p>
+      <h2 style="font-size:2rem;margin-top:.3rem;">Leading barangays</h2>
+      <div class="bar-list">
+        {% for row in figures.by_barangay %}
+          <div>
+            <div class="bar-label"><span>{{ row.name }}</span><span>{{ row.count }}</span></div>
+            <div class="bar"><span style="width: {{ row.pct }}%"></span></div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+<section class="panel" style="margin-top:1rem;">
+  <p class="eyebrow">Latest</p>
+  <h2 style="font-size:2rem;margin-top:.3rem;">Recently touched records</h2>
+  <ul class="recent">
+    {% for member in figures.recent %}
+      <li>
+        <a href="{{ url_for('members.detail', member_id=member.id) }}">
+          <strong>{{ member.body_number }} · {{ member.owner_name }}</strong>
+          <span class="muted">{{ member.driver_role }} · {{ member.association or 'No association' }}</span>
+        </a>
+        <time datetime="{{ member.updated_at.isoformat() }}">{{ member.updated_at|manila }}</time>
+      </li>
+    {% else %}
+      <li>No records yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

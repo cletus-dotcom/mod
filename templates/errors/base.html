@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}Notice{% endblock %} · Jagna Motorela</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/seal.png') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="error-page">
+  <div>
+    <img src="{{ url_for('static', filename='img/seal.png') }}" alt="Official Seal of the Municipality of Jagna">
+    {% block body %}{% endblock %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: jagna-motorela-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: motorela
+      POSTGRES_PASSWORD: motorela_local
+      POSTGRES_DB: motorela
+    ports:
+      - "5433:5432"
+    volumes:
+      - motorela_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U motorela -d motorela"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  motorela_pg:

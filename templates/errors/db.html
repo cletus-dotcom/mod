@@ -1,0 +1,7 @@
+{% extends "errors/base.html" %}
+{% block title %}Database unavailable{% endblock %}
+{% block body %}
+<h1>Database unavailable</h1>
+<p>The registry could not reach PostgreSQL. Start the database, then refresh.</p>
+<pre>docker compose up -d</pre>
+{% endblock %}
